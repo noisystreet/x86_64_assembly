@@ -4,11 +4,214 @@
 编写汇编库
 ===============================
 
-.. 本篇内容
+将汇编代码封装为可重用的库（静态库或共享库），是现代汇编工程实践的重要组成部分。
 
-    - 导出符号（global）
-    - 创建静态库（.a）
-    - 创建共享库（.so）
-    - 与 C 程序链接
+导出符号
+============
 
-TODO: 编写内容
+使用 ``global`` 伪指令将汇编标号导出，使链接器和其他目标文件可以引用：
+
+.. code-block:: none
+
+   ; math_utils.asm——汇编数学库
+   section .text
+
+   ; 导出所有公共函数
+   global add_i64
+   global sub_i64
+   global mul_i64
+   global div_i64
+
+   ; long add_i64(long a, long b)
+   add_i64:
+       mov rax, rdi
+       add rax, rsi
+       ret
+
+   ; long sub_i64(long a, long b)
+   sub_i64:
+       mov rax, rdi
+       sub rax, rsi
+       ret
+
+   ; long mul_i64(long a, long b)
+   mul_i64:
+       mov rax, rdi
+       imul rax, rsi
+       ret
+
+   ; long div_i64(long a, long b)
+   div_i64:
+       test rsi, rsi            ; 除零检查
+       jz   .error
+       xor rdx, rdx
+       mov rax, rdi
+       idiv rsi
+       ret
+   .error:
+       mov rax, -1
+       ret
+
+创建静态库（.a）
+===================
+
+.. code-block:: bash
+
+   # 汇编为对象文件
+   nasm -f elf64 math_utils.asm -o math_utils.o
+
+   # 创建静态库
+   ar rcs libmath.a math_utils.o
+
+   # 查看库中的符号
+   nm libmath.a
+
+   # 使用静态库
+   gcc main.c -L. -lmath -o program
+
+创建共享库（.so）
+===================
+
+共享库需要位置无关代码（PIC, Position-Independent Code）：
+
+.. code-block:: none
+
+   ; string_utils.asm——位置无关的字符串库
+   section .text
+       global strlen_pic
+       global strcpy_pic
+
+   ; size_t strlen_pic(const char *s)
+   strlen_pic:
+       xor rax, rax
+   .loop:
+       cmp byte [rdi + rax], 0
+       je .done
+       inc rax
+       jmp .loop
+   .done:
+       ret
+
+   ; char *strcpy_pic(char *dst, const char *src)
+   strcpy_pic:
+       xor rax, rax
+   .loop:
+       mov cl, [rsi + rax]
+       mov [rdi + rax], cl
+       inc rax
+       test cl, cl
+       jnz .loop
+       mov rax, rdi
+       ret
+
+.. code-block:: bash
+
+   # 编译为位置无关的对象文件
+   nasm -f elf64 string_utils.asm -o string_utils.o
+
+   # 创建共享库
+   gcc -shared string_utils.o -o libstring.so
+
+   # 使用共享库
+   gcc main.c -L. -lstring -o program
+
+   # 确保运行时能找到库
+   export LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH
+   ./program
+
+带有 C 头文件的汇编库
+=========================
+
+创建一个完整的汇编库，使 C 代码可以像调用普通 C 函数一样使用：
+
+.. code-block:: c
+   :caption: include/math_utils.h
+
+   #ifndef MATH_UTILS_H
+   #define MATH_UTILS_H
+
+   long add_i64(long a, long b);
+   long sub_i64(long a, long b);
+   long mul_i64(long a, long b);
+   long div_i64(long a, long b);
+
+   #endif
+
+.. code-block:: c
+   :caption: main.c（使用汇编库）
+
+   #include <stdio.h>
+   #include "include/math_utils.h"
+
+   int main(void) {
+       long a = 100, b = 7;
+       printf("%ld + %ld = %ld\n", a, b, add_i64(a, b));
+       printf("%ld - %ld = %ld\n", a, b, sub_i64(a, b));
+       printf("%ld * %ld = %ld\n", a, b, mul_i64(a, b));
+       printf("%ld / %ld = %ld rem %ld\n",
+              a, b, div_i64(a, b), a % b);
+       return 0;
+   }
+
+.. code-block:: bash
+
+   # 完整构建流程
+   nasm -f elf64 math_utils.asm -o math_utils.o
+   ar rcs libmath.a math_utils.o
+   gcc main.c -L. -lmath -o program
+   ./program
+
+使用 NASM 宏组织代码
+=========================
+
+对于较大的库，使用宏可以提高可维护性：
+
+.. code-block:: none
+
+   ; 宏：定义导出函数
+   %macro export_func 1
+       global %1
+       %1:
+   %endmacro
+
+   ; 宏：函数序言
+   %macro func_prologue 0
+       push rbp
+       mov  rbp, rsp
+   %endmacro
+
+   ; 宏：函数尾声
+   %macro func_epilogue 0
+       pop  rbp
+       ret
+   %endmacro
+
+   section .text
+       export_func abs_i64       ; 展开为 global abs_i64 / abs_i64:
+       func_prologue
+       test rdi, rdi
+       jns .done
+       neg rdi
+   .done:
+       mov rax, rdi
+       func_epilogue
+
+C 与汇编混合工程结构建议
+============================
+
+.. code-block:: text
+
+   project/
+   ├── include/           # 头文件（声明汇编函数）
+   │   ├── math_utils.h
+   │   └── string_utils.h
+   ├── src/               # C 源码
+   │   └── main.c
+   ├── asm/               # 汇编源码
+   │   ├── math_utils.asm
+   │   └── string_utils.asm
+   ├── lib/               # 生成的库文件
+   │   ├── libmath.a
+   │   └── libstring.so
+   ├── Makefile
+   └── README.md

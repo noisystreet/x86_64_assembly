@@ -4,12 +4,236 @@
 控制流指令
 ===============================
 
-.. 本篇内容
+控制流指令改变程序的执行顺序，包括无条件跳转、条件跳转和子程序调用。
 
-    - jmp（无条件跳转）
-    - 条件跳转（je, jne, jg, jl, jge, jle 等）
-    - cmp（比较）
-    - test（测试）
-    - call / ret（子程序调用与返回）
+``jmp`` 无条件跳转
+=======================
 
-TODO: 编写内容
+``jmp`` 直接将指令指针 ``rip`` 设置为目标地址，接下来的指令从目标地址开始执行。
+
+.. code-block:: none
+
+   section .text
+       ; 直接跳转（到标号）
+       jmp .label
+
+       ; 以下代码被跳过
+       mov rax, 42
+
+   .label:
+       mov rax, 100      ; 从这里继续执行
+
+       ; 寄存器间接跳转
+       lea rbx, [.target]
+       jmp rbx           ; 跳转到 rbx 中保存的地址
+
+   .target:
+       xor rax, rax
+
+``cmp`` 比较与标志位
+========================
+
+``cmp`` 执行 ``dst - src`` 的减法运算，但**不保存结果**，只设置标志位。后续条件跳转根据标志位决定是否跳转。
+
+.. code-block:: none
+
+   cmp rax, rbx          ; 计算 rax - rbx，设置标志位
+   ; 之后根据标志位判断：
+   ;   ZF=1 → rax == rbx
+   ;   ZF=0 → rax != rbx
+   ;   SF=OF → rax >= rbx（有符号）
+   ;   CF=1 → rax < rbx（无符号）
+
+.. list-table:: ``cmp`` 后的标志位含义
+   :header-rows: 1
+
+   * - 关系
+     - 有符号标志
+     - 无符号标志
+   * - dst == src
+     - ZF=1
+     - ZF=1
+   * - dst != src
+     - ZF=0
+     - ZF=0
+   * - dst > src
+     - SF=OF 且 ZF=0
+     - CF=0 且 ZF=0
+   * - dst >= src
+     - SF=OF
+     - CF=0
+   * - dst < src
+     - SF≠OF
+     - CF=1
+   * - dst <= src
+     - SF≠OF 或 ZF=1
+     - CF=1 或 ZF=1
+
+条件跳转指令
+================
+
+条件跳转检查标志位的状态，满足条件时跳转到目标地址。
+
+有符号比较跳转
+-----------------
+
+.. code-block:: none
+
+   cmp rax, rbx
+
+   je  .equal            ; 跳转 if rax == rbx (ZF=1)
+   jne .not_equal        ; 跳转 if rax != rbx (ZF=0)
+   jg  .greater          ; 跳转 if rax >  rbx (SF=OF && ZF=0)
+   jge .ge               ; 跳转 if rax >= rbx (SF=OF)
+   jl  .less             ; 跳转 if rax <  rbx (SF≠OF)
+   jle .le               ; 跳转 if rax <= rbx (SF≠OF || ZF=1)
+
+无符号比较跳转
+-----------------
+
+.. code-block:: none
+
+   cmp rax, rbx
+
+   ja  .above            ; 跳转 if rax >  rbx (CF=0 && ZF=0)
+   jae .above_equal      ; 跳转 if rax >= rbx (CF=0)
+   jb  .below            ; 跳转 if rax <  rbx (CF=1)
+   jbe .below_equal      ; 跳转 if rax <= rbx (CF=1 || ZF=1)
+
+简单标志跳转
+----------------
+
+.. code-block:: none
+
+   ; 不需要先执行 cmp
+   jz  .zero             ; 跳转 if ZF=1
+   jnz .non_zero         ; 跳转 if ZF=0
+   js  .negative         ; 跳转 if SF=1
+   jns .positive         ; 跳转 if SF=0
+   jo  .overflow         ; 跳转 if OF=1
+   jno .no_overflow      ; 跳转 if OF=0
+
+.. code-block:: none
+
+   ; 完整示例：计算两个数的最大值
+   section .text
+       mov rax, 50
+       mov rbx, 100
+
+       cmp rax, rbx
+       jge  .max_is_rax   ; 如果 rax >= rbx，跳转
+       mov rax, rbx        ; 否则 rax = rbx
+
+   .max_is_rax:
+       ; rax 中为最大值
+       mov rax, 60
+       xor rdi, rdi
+       syscall
+
+``test`` 与条件跳转组合
+=============================
+
+``test`` 执行按位 ``and`` 但不写回结果，只设置标志位，常与条件跳转配合。
+
+.. code-block:: none
+
+   test rax, rax          ; 检查 rax 是否为 0
+   jz   .zero             ; rax == 0 时跳转
+
+   test rax, 1            ; 检查最低位
+   jnz  .odd              ; 最低位为 1 → 奇数
+
+   ; 检查是否设置了多个标志位中的某一个
+   test rcx, 0x1100       ; 检查第 8 位或第 12 位
+   jnz  .flag_set         ; 任一位置 1 即跳转
+
+``cmov`` 条件传送
+====================
+
+条件传送指令根据标志位决定是否执行数据传送，避免分支预测失败，常用于无分支编程。
+
+.. code-block:: none
+
+   ; 格式：cmovcc dst, src
+   ; 条件是 `cc` 满足时执行 mov
+
+   mov rax, 50
+   mov rbx, 100
+   cmp rax, rbx
+
+   cmovg rax, rbx        ; 如果 rax > rbx，则 rax = rbx（否则不动）
+   ; 相当于 rax = max(rax, rbx)
+
+.. list-table::
+   :header-rows: 1
+
+   * - 条件码后缀
+     - 含义
+     - 标志位条件
+   * - ``e`` / ``z``
+     - 相等 / 零
+     - ZF=1
+   * - ``ne`` / ``nz``
+     - 不相等 / 非零
+     - ZF=0
+   * - ``g``
+     - 大于（有符号）
+     - SF=OF 且 ZF=0
+   * - ``ge``
+     - 大于等于（有符号）
+     - SF=OF
+   * - ``l``
+     - 小于（有符号）
+     - SF≠OF
+   * - ``le``
+     - 小于等于（有符号）
+     - SF≠OF 或 ZF=1
+   * - ``a``
+     - 大于（无符号）
+     - CF=0 且 ZF=0
+   * - ``ae``
+     - 大于等于（无符号）
+     - CF=0
+   * - ``b``
+     - 小于（无符号）
+     - CF=1
+   * - ``be``
+     - 小于等于（无符号）
+     - CF=1 或 ZF=1
+
+``call`` / ``ret`` 子程序调用与返回
+=========================================
+
+``call`` 指令：1）将返回地址（即 ``call`` 的下一条指令地址）压栈；2）跳转到目标地址。
+
+``ret`` 指令：从栈顶弹出返回地址，跳转回去。
+
+.. code-block:: none
+
+   section .text
+       call my_func      ; 1. 压入返回地址 2. 跳转到 my_func
+       mov rax, 60       ; 调用返回后从这里继续
+
+   my_func:
+       ; 函数体
+       ret               ; 弹出返回地址，跳回 call 的下一条指令
+
+关于栈帧和参数传递的更多细节，参见第 4 章。
+
+循环结构
+============
+
+使用条件跳转可以实现循环：
+
+.. code-block:: none
+
+   ; 计算 1+2+...+10 的和
+       mov rcx, 10        ; 循环计数器
+       xor rax, rax       ; sum = 0
+
+   .loop:
+       add rax, rcx       ; sum += counter
+       dec rcx            ; counter--
+       jnz .loop          ; 如果 counter != 0 继续循环
+
+       ; 此时 rax = 55（1+2+...+10）
