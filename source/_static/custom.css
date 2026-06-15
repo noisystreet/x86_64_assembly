@@ -1,0 +1,21 @@
+/* Custom CSS for x86_64 Assembly Tutorial */
+
+/* Improve code block readability */
+.highlight {
+    background: #f8f8f8;
+}
+
+/* Assembly code specific styling */
+.highlight-nasm .c1 {
+    color: #998;
+    font-style: italic;
+}
+
+/* Make tables more readable */
+.docutils table {
+    border-collapse: collapse;
+}
+
+.docutils th, .docutils td {
+    padding: 8px 12px;
+}

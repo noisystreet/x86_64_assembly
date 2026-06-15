@@ -1,0 +1,19 @@
+# Sphinx 构建输出
+_build/
+
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
+
+# 编辑器/系统文件
+.DS_Store
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# 临时文件
+*.tmp
+*.bak
