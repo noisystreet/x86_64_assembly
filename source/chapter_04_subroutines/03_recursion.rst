@@ -37,20 +37,14 @@
        pop  rbp
        ret
 
-.. code-block:: text
+.. mermaid::
 
-   计算 factorial(5) 的栈帧演变：
-   ┌────────────────────────┐
-   │   factorial(5) 栈帧     │  n=5, 保存 rdi=5
-   ├────────────────────────┤
-   │   factorial(4) 栈帧     │  n=4, 保存 rdi=4
-   ├────────────────────────┤
-   │   factorial(3) 栈帧     │  n=3, 保存 rdi=3
-   ├────────────────────────┤
-   │   factorial(2) 栈帧     │  n=2, 保存 rdi=2
-   ├────────────────────────┤
-   │   factorial(1) 栈帧     │  base case, 返回 1
-   └────────────────────────┘
+   flowchart TD
+       F5[factorial 5 栈帧 n=5] --> F4[factorial 4 栈帧 n=4]
+       F4 --> F3[factorial 3 栈帧 n=3]
+       F3 --> F2[factorial 2 栈帧 n=2]
+       F2 --> F1[factorial 1 栈帧 base case]
+
    ↑ 递归深度为 5，消耗约 5 × 32 = 160 字节栈空间
 
 斐波那契数列

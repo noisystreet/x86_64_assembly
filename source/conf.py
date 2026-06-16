@@ -23,7 +23,12 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.extlinks',
     'sphinx.ext.intersphinx',
+    'sphinxcontrib.mermaid',
 ]
+
+# -- Mermaid configuration ---------------------------------------------------
+
+mermaid_output_format = 'raw'  # 在 RTD 上也能正常渲染
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
