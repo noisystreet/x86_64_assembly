@@ -1,5 +1,7 @@
 # x86_64 汇编语言教程
 
+[![CI](https://github.com/noisystreet/x86_64_assembly/actions/workflows/ci.yml/badge.svg)](https://github.com/noisystreet/x86_64_assembly/actions/workflows/ci.yml)
+
 x86_64 汇编语言入门与进阶教程，涵盖基础语法、指令集、调用约定、SIMD、优化、多线程等主题。
 
 ## 文档
