@@ -38,4 +38,4 @@ source/
 
 ## 许可证
 
-MIT
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
