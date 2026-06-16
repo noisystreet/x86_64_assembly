@@ -12,3 +12,4 @@
    03_first_program
    04_nasm_syntax
    05_gas_syntax
+   06_nasm_macros

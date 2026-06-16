@@ -169,3 +169,57 @@
    * - ``ror``
      - 循环右移
      - 位旋转、密码学
+
+位扫描指令（BSF / BSR / POPCNT）
+=====================================
+
+位扫描指令用于查找位位置和统计位数：
+
+.. code-block:: none
+
+   ; bsf: 向前扫描（从低位到高位），找到第一个 1 的位置
+   mov rax, 0x1000               ; rax = 0000 0000 0000 1000 0000...
+   bsf rbx, rax                  ; rbx = 12（第 12 位是第一个 1）
+   jz  .zero                     ; 如果没有 1（ZF=1），跳转
+
+   ; bsr: 向后扫描（从高位到低位），找到最后一个 1 的位置
+   mov rax, 0x1010               ; 二进制：...0001 0000 0001 0000
+   bsr rcx, rax                  ; rcx = 12（两个 1 中最高位的位置）
+
+   ; popcnt: 统计 1 的个数（需要 SSE4.2 支持）
+   mov rax, 0xFF                 ; 8 个 1
+   popcnt rbx, rax               ; rbx = 8
+   popcnt rcx, qword [mask]      ; 统计内存中的 1 位数
+
+   ; tzcnt: 尾随零计数（Haswell+，与 BSF 不同之处在于对 0 的处理）
+   mov rax, 0x1000
+   tzcnt rbx, rax                ; rbx = 12（与 BSF 相同）
+   ; tzcnt 对 0 输入返回操作数大小，而 BSF 设置 ZF=1 且结果未定义
+
+.. list-table::
+   :header-rows: 1
+
+   * - 指令
+     - 操作
+     - 性能
+     - 需要
+   * - ``bsf``
+     - 向前扫描第一个 1
+     - 1-3 周期
+     - 所有 x86_64
+   * - ``bsr``
+     - 向后扫描最后一个 1
+     - 1-3 周期
+     - 所有 x86_64
+   * - ``popcnt``
+     - 统计 1 的个数
+     - 1 周期
+     - SSE4.2（Nehalem+）
+   * - ``tzcnt``
+     - 尾随零计数
+     - 1 周期
+     - Haswell+
+   * - ``lzcnt``
+     - 前导零计数
+     - 1 周期
+     - Haswell+

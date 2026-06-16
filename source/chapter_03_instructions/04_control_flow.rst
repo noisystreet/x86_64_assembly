@@ -218,7 +218,7 @@
        ; 函数体
        ret               ; 弹出返回地址，跳回 call 的下一条指令
 
-关于栈帧和参数传递的更多细节，参见第 4 章。
+关于栈帧和参数传递的更多细节，参见 :ref:`chapter-04`。
 
 循环结构
 ============
@@ -237,3 +237,34 @@
        jnz .loop          ; 如果 counter != 0 继续循环
 
        ; 此时 rax = 55（1+2+...+10）
+
+``loop`` / ``loope`` / ``loopne`` 循环指令
+===============================================
+
+x86_64 提供了专用的循环指令，它们隐式使用 ``rcx`` 作为计数器：
+
+.. code-block:: none
+
+   ; loop target: rcx--; 如果 rcx != 0，跳转
+       mov rcx, 10
+   .loop:
+       ; ... 循环体 ...
+       loop .loop                 ; rcx--; if (rcx) goto .loop
+
+   ; loope (loopz): rcx--; 如果 rcx != 0 且 ZF=1，跳转
+   ; loopne (loopnz): rcx--; 如果 rcx != 0 且 ZF=0，跳转
+       mov rcx, 100
+       xor rax, rax
+   .scan:
+       cmp byte [rdi + rax], 0
+       loopne .scan               ; 直到找到 NUL 或遍历完
+
+   ; jecxz / jrcxz: 如果 ecx/rcx == 0，跳转
+       jrcxz .skip                ; 如果 rcx == 0，跳过处理
+       ; ... 需要 rcx>0 的代码 ...
+   .skip:
+
+.. warning::
+
+   ``loop`` 指令在现代 CPU 上性能较低（吞吐量不如 ``dec rcx; jnz``），
+   因为其隐式标志位修改破坏了流水线。在高性能代码中，优先使用 ``dec rcx; jnz``。
