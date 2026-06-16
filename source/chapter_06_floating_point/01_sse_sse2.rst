@@ -1,4 +1,4 @@
-.. _chapter-06-floating-point:
+.. _chapter-06-sse:
 
 ===============================
 SSE/SSE2 浮点运算
