@@ -12,3 +12,4 @@
    03_logical
    04_control_flow
    05_system_calls
+   06_special_instructions
