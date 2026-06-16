@@ -18,7 +18,7 @@
 | `source/preface.rst` | 前言：为什么学习汇编、目标读者、预备知识、全书结构 |
 | `source/index.rst` | Sphinx 根文档（toctree 入口） |
 | `source/chapter_01_basics/` | 基础知识与环境搭建（汇编概念、NASM 安装、Hello World、语法基础） |
-| `source/chapter_02_architecture/` | x86_64 体系结构（寄存器、内存模型、寻址方式、栈） |
+| `source/chapter_02_architecture/` | x86_64 架构（微架构概述、寄存器、内存模型、寻址方式、栈） |
 | `source/chapter_03_instructions/` | 指令集（数据传送、算术、逻辑、控制流、系统调用） |
 | `source/chapter_04_subroutines/` | 子程序与调用约定（System V ABI、栈帧、递归） |
 | `source/chapter_05_data/` | 数据结构（数组、字符串、结构体） |
@@ -76,7 +76,7 @@
 按以下顺序推进内容编写：
 
 1. **第 1 章：基础知识与环境搭建** — 汇编概念、NASM 安装、Hello World、语法基础
-2. **第 2 章：体系结构** — 寄存器、内存模型、寻址方式、栈
+2. **第 2 章：x86_64 架构** — 微架构概述、寄存器、内存模型、寻址方式、栈
 3. **第 3 章：指令集** — 数据传送 → 算术 → 逻辑 → 控制流 → 系统调用
 4. **第 4 章：子程序与调用约定** — ABI、栈帧、递归
 5. **第 5 章：数据结构** — 数组、字符串、结构体
