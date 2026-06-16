@@ -215,3 +215,19 @@ C 与汇编混合工程结构建议
    │   └── libstring.so
    ├── Makefile
    └── README.md
+
+练习题
+========
+
+1. 创建 ``math_utils.asm`` 文件，导出 ``add_i64``、``sub_i64``、``mul_i64``、``div_i64``
+   四个函数。编写 C 程序调用它们，编译并运行。
+
+2. 将上述函数打包为静态库 ``libmath.a``，在编译 C 程序时通过 ``-lmath`` 链接。
+
+3. 将其中一部分函数改为共享库 ``libmath.so``，运行时通过 ``LD_LIBRARY_PATH`` 加载。
+
+4. 编写一个汇编函数 ``reverse_str``，接收 C 字符串指针，原地反转字符串。
+   在 C 代码中声明并调用它。
+
+5. 在 C 代码中使用 ``asm`` 关键字（内联汇编）实现一个简单的 ``cpuid`` 指令封装，
+   读取 CPU 的 vendor ID 字符串。

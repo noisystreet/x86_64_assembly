@@ -1,21 +1,103 @@
 /* Custom CSS for x86_64 Assembly Tutorial */
 
-/* Improve code block readability */
+/* Code block styling */
 .highlight {
     background: #f8f8f8;
+    border-radius: 3px;
 }
 
-/* Assembly code specific styling */
-.highlight-nasm .c1 {
+div[class*="highlight"] pre {
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+/* Assembly-specific: comments italic, gray */
+.highlight-nasm .c1,
+.highlight-gas .c1,
+.highlight-asm .c1 {
     color: #998;
     font-style: italic;
 }
 
-/* Make tables more readable */
+/* Keyword highlighting */
+.highlight-nasm .k {
+    font-weight: 600;
+}
+
+/* Register highlighting */
+.highlight-nasm .n,
+.highlight-asm .n {
+    color: #2c6f9e;
+}
+
+/* Tables */
 .docutils table {
     border-collapse: collapse;
+    margin: 1em 0;
 }
 
 .docutils th, .docutils td {
     padding: 8px 12px;
+    border: 1px solid #ddd;
+}
+
+.docutils th {
+    background: #f0f0f0;
+    font-weight: 600;
+}
+
+/* Glossary styling */
+.glossary dt {
+    font-weight: 600;
+    margin-top: 0.8em;
+    color: #2980b9;
+}
+
+.glossary dd {
+    margin-left: 1.5em;
+    margin-bottom: 0.5em;
+}
+
+/* Exercise / admonition boxes */
+div.admonition-exercise {
+    border-left: 4px solid #27ae60;
+}
+
+div.admonition-exercise .admonition-title {
+    background: #27ae60;
+    color: white;
+}
+
+/* Tip box for side notes */
+div.admonition-tip {
+    border-left: 4px solid #8e44ad;
+}
+
+div.admonition-tip .admonition-title {
+    background: #8e44ad;
+    color: white;
+}
+
+/* Improve RTD theme readability */
+.wy-nav-content {
+    max-width: 900px;
+}
+
+.rst-content .section ul li,
+.rst-content .section ol li {
+    margin-bottom: 4px;
+}
+
+/* Mermaid diagrams centered */
+.mermaid {
+    text-align: center;
+    margin: 1.5em auto;
+}
+
+/* Code-block captions */
+.code-block-caption {
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 4px;
 }

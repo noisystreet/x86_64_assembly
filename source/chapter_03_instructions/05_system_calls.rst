@@ -245,3 +245,19 @@ Linux x86_64 系统调用机制
        mov rax, 60
        mov rdi, 1
        syscall
+
+练习题
+========
+
+1. 编写程序使用 ``sys_write`` 输出 "Hello, x86_64!" 并换行，然后用 ``sys_exit(0)`` 退出。
+
+2. 修改上述程序，改用 ``sys_read`` 从标准输入读取一个字符串，然后将其原样输出到标准输出
+   （即实现一个简单的 ``cat`` 命令）。
+
+3. 使用 ``sys_open`` 打开一个已有文件并用 ``sys_read`` 读取其内容，输出到标准输出。
+   使用 ``test rax, rax; js .error`` 处理文件不存在的错误。
+
+4. 用 ``sys_mmap`` 分配 4096 字节的匿名内存，在其中写入一个字符串，再用 ``sys_write`` 输出。
+
+5. 编写程序创建 ``test.txt`` 文件（使用 ``O_CREAT|O_WRONLY``），写入 "Hello, world!\n"，
+   然后关闭并退出。用 ``cat test.txt`` 验证结果。

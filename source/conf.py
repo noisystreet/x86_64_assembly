@@ -1,14 +1,12 @@
 # x86_64 Assembly Language Tutorial - Sphinx Configuration
 # =======================================================
 
-import os
-import sys
 from datetime import datetime
 
 # -- Project information -----------------------------------------------------
 
 project = 'x86_64 汇编语言教程'
-author = 'Your Name'
+author = 'noisystreet'
 copyright = f'{datetime.now().year}, {author}'
 
 # The short X.Y version
