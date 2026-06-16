@@ -33,6 +33,28 @@ check_sphinx() {
     fi
 }
 
+check_rst_inline_markup() {
+    local files=("$@")
+    local has_error=0
+
+    for f in "${files[@]}"; do
+        # 检查 :role:`xxx` 内联标记后紧跟中文括号/逗号（缺少空格）
+        # 这会导致 Sphinx 解析异常，产生 "end-string" 警告
+        if grep -Pn ':\w+:`[^`]*`[（）]' "$f" &>/dev/null; then
+            if [ $has_error -eq 0 ]; then
+                echo -e "${YELLOW}⚠  :strong: 等角色标记后紧跟中文括号（缺少空格）:${NC}"
+            fi
+            echo -e "  ${YELLOW}$f${NC}"
+            grep -Pn ':\w+:`[^`]*`[（）]' "$f" | while read -r line; do
+                echo "    $line"
+            done
+            has_error=1
+        fi
+    done
+
+    return $has_error
+}
+
 check_rst_files() {
     local files=("$@")
     if [ ${#files[@]} -eq 0 ]; then
@@ -91,6 +113,11 @@ if [ "$1" = "--hook" ]; then
     check_rst_files $STAGED_FILES
     EXIT_CODE=$?
 
+    # 额外检查内联标记格式
+    if [ -n "$STAGED_FILES" ]; then
+        check_rst_inline_markup $STAGED_FILES && true
+    fi
+
 elif [ "$1" = "--staged" ]; then
     # 只检查暂存区文件
     STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.rst$' || true)
@@ -105,6 +132,9 @@ else
     echo -e "${YELLOW}=== 检查所有 RST 文档 ===${NC}"
     RST_FILES=$(find "$PROJECT_ROOT/source" -name '*.rst' | sort)
     check_rst_files $RST_FILES
+
+    # 额外检查内联标记格式
+    check_rst_inline_markup $RST_FILES
 fi
 
 case $EXIT_CODE in
