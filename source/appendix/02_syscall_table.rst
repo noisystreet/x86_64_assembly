@@ -233,5 +233,185 @@ mmap 保护标志和映射标志
      - 获取当前 CPU 和 NUMA 节点
    * - 202
      - ``sys_futex``
-     - rdi=uaddr, rsi=op, rdx=val, r10=timeout
-     - 快速用户态互斥
+     - rdi=uaddr, rsi=op, rdx=val, r10=timeout, r8=uaddr2, r9=val3
+     - 快速用户态互斥（线程同步核心）
+
+网络通信
+============
+
+.. list-table::
+   :header-rows: 1
+
+   * - 编号
+     - 名称
+     - 参数
+     - 描述
+   * - 41
+     - ``sys_socket``
+     - rdi=domain, rsi=type, rdx=protocol
+     - 创建套接字
+   * - 42
+     - ``sys_connect``
+     - rdi=fd, rsi=addr, rdx=addrlen
+     - 连接远程地址
+   * - 49
+     - ``sys_bind``
+     - rdi=fd, rsi=addr, rdx=addrlen
+     - 绑定地址到套接字
+   * - 50
+     - ``sys_listen``
+     - rdi=fd, rsi=backlog
+     - 监听连接
+   * - 43
+     - ``sys_accept``
+     - rdi=fd, rsi=addr, rdx=addrlen
+     - 接受连接
+   * - 44
+     - ``sys_sendto``
+     - rdi=fd, rsi=buf, rdx=len, r10=flags, r8=addr, r9=addrlen
+     - 发送数据报
+   * - 45
+     - ``sys_recvfrom``
+     - rdi=fd, rsi=buf, rdx=len, r10=flags, r8=addr, r9=addrlen
+     - 接收数据报
+   * - 54
+     - ``sys_setsockopt``
+     - rdi=fd, rsi=level, rdx=optname, r10=optval, r8=optlen
+     - 设置套接字选项
+   * - 55
+     - ``sys_getsockopt``
+     - rdi=fd, rsi=level, rdx=optname, r10=optval, r8=optlen
+     - 获取套接字选项
+
+高级 I/O 与事件
+===================
+
+.. list-table::
+   :header-rows: 1
+
+   * - 编号
+     - 名称
+     - 参数
+     - 描述
+   * - 19
+     - ``sys_readv``
+     - rdi=fd, rsi=iov, rdx=iovcnt
+     - 分散读取（scatter-gather）
+   * - 20
+     - ``sys_writev``
+     - rdi=fd, rsi=iov, rdx=iovcnt
+     - 集中写入（scatter-gather）
+   * - 17
+     - ``sys_pread64``
+     - rdi=fd, rsi=buf, rdx=count, r10=pos
+     - 指定位置读取（不改变文件偏移）
+   * - 18
+     - ``sys_pwrite64``
+     - rdi=fd, rsi=buf, rdx=count, r10=pos
+     - 指定位置写入
+   * - 8
+     - ``sys_lseek``
+     - rdi=fd, rsi=offset, rdx=whence
+     - 重定位文件偏移
+   * - 40
+     - ``sys_sendfile``
+     - rdi=out_fd, rsi=in_fd, rdx=offset, r10=count
+     - 高效文件到文件描述符传输
+   * - 213
+     - ``sys_eventfd2``
+     - rdi=initval, rsi=flags
+     - 创建事件通知文件描述符
+   * - 232
+     - ``sys_epoll_create1``
+     - rdi=flags
+     - 创建 epoll 实例
+   * - 233
+     - ``sys_epoll_ctl``
+     - rdi=epfd, rsi=op, rdx=fd, r10=event
+     - 控制 epoll 事件
+   * - 234
+     - ``sys_epoll_wait``
+     - rdi=epfd, rsi=events, rdx=evcnt, r10=timeout
+     - 等待 epoll 事件
+
+安全与随机数
+================
+
+.. list-table::
+   :header-rows: 1
+
+   * - 编号
+     - 名称
+     - 参数
+     - 描述
+   * - 317
+     - ``sys_seccomp``
+     - rdi=op, rsi=flags, rdx=prog
+     - 设置安全计算模式（sandbox）
+   * - 318
+     - ``sys_getrandom``
+     - rdi=buf, rsi=buflen, rdx=flags
+     - 获取 cryptographically secure 随机数
+
+时间与定时器
+================
+
+.. list-table::
+   :header-rows: 1
+
+   * - 编号
+     - 名称
+     - 参数
+     - 描述
+   * - 228
+     - ``sys_clock_gettime``
+     - rdi=clk_id, rsi=tp
+     - 获取指定时钟时间（高精度）
+   * - 230
+     - ``sys_clock_nanosleep``
+     - rdi=clk_id, rsi=flags, rdx=req, r10=rem
+     - 高精度休眠（指定时钟）
+   * - 283
+     - ``sys_timerfd_create``
+     - rdi=clk_id, rsi=flags
+     - 创建定时器文件描述符
+   * - 286
+     - ``sys_timerfd_settime``
+     - rdi=fd, rsi=flags, rdx=new, r10=old
+     - 设置定时器参数
+
+更多进程控制
+================
+
+.. list-table::
+   :header-rows: 1
+
+   * - 编号
+     - 名称
+     - 参数
+     - 描述
+   * - 110
+     - ``sys_getppid``
+     -
+     - 获取父进程 ID
+   * - 112
+     - ``sys_setsid``
+     -
+     - 创建新会话
+   * - 119
+     - ``sys_getpgid``
+     - rdi=pid
+     - 获取进程组 ID
+   * - 157
+     - ``sys_prctl``
+     - rdi=op, rsi=arg2, rdx=arg3, r10=arg4, r8=arg5
+     - 进程控制（设置名称、seccomp 等）
+   * - 158
+     - ``sys_arch_prctl``
+     - rdi=code, rsi=addr
+     - 架构特定控制（设置 fs.base 等）
+
+.. note::
+
+   上述系统调用号基于 Linux x86_64。不同架构（ARM、RISC-V 等）的系统调用号完全不同。
+   可通过 ``/usr/include/asm/unistd_64.h`` 查看完整列表。

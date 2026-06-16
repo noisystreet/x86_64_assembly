@@ -54,6 +54,26 @@ clone 系统调用
      - 0x2000000
      - 将子 TID 写入子线程
 
+.. note::
+
+   创建线程时，以上标志通常一起使用。一个经典的组合是：
+
+   .. code-block:: none
+
+      ; 线程标志组合
+      THREAD_FLAGS equ \
+          CLONE_VM       | \   ; 共享地址空间
+          CLONE_FS       | \   ; 共享文件系统
+          CLONE_FILES    | \   ; 共享文件描述符
+          CLONE_SIGHAND  | \   ; 共享信号处理
+          CLONE_THREAD           ; 同一线程组
+
+   注意 ``CLONE_THREAD`` 的缺失后果：没有它，``clone`` 创建的是一个**进程**（子进程），
+   而非线程（子进程拥有独立的 PID）。
+
+   Linux 5.3 引入了更新、更灵活的 ``clone3`` 系统调用（RAX=435），
+   通过结构体传递参数，避免了 ``clone`` 参数过多的可维护性问题。
+
 线程创建示例
 ================
 
@@ -139,6 +159,71 @@ x86_64 通过 ``fs`` 段寄存器实现 TLS。
        ; 在线程中访问 TLS
        mov rax, [fs:0]                       ; 访问 TLS 变量 1
        mov qword [fs:8], 42                  ; 设置 TLS 变量 2
+
+.. note::
+
+   TLS 的底层机制是 ``fs`` 段寄存器的基地址（Base Address）。x86_64 提供了
+   ``arch_prctl`` 系统调用（RAX=158）来读写 ``fs`` 基地址：
+
+   .. code-block:: none
+
+      ; 使用 arch_prctl 设置 fs.base
+      ; 参数：rdi = 操作码，rsi = 地址
+      ; ARCH_SET_FS = 0x1002（设置 fs.base）
+      ; ARCH_GET_FS = 0x1003（读取 fs.base）
+
+      mov  rdi, 0x1002          ; ARCH_SET_FS
+      mov  rsi, tls_area        ; 设置 fs.base = tls_area
+      mov  rax, 158             ; sys_arch_prctl
+      syscall
+
+   C 运行时（glibc）的 ``pthread_create`` 会为每个线程分配 TLS 区域，
+   并通过 ``arch_prctl`` 设置 ``fs.base``。因此汇编中直接调用 ``pthread``
+   接口时，无需手动处理 TLS 设置。
+
+线程生命周期
+================
+
+一个线程从创建到结束经历以下状态：
+
+.. list-table::
+   :header-rows: 1
+
+   * - 阶段
+     - 说明
+     - 关键操作
+   * - 创建
+     - ``clone`` 系统调用返回新的 TID
+     - 分配栈空间，设置 TLS
+   * - 运行
+     - 线程函数执行
+     - 使用共享内存/锁/信号量
+   * - 等待
+     - 线程主动调用 ``futex(FUTEX_WAIT)`` 或等待锁
+     - 进入阻塞状态，不消耗 CPU
+   * - 终止
+     - 线程函数 ``ret`` 或调用 ``sys_exit``
+     - 释放栈空间，通知其他线程
+
+``pthread_join`` 对应等待阶段：调用线程阻塞直到目标线程终止，
+   并回收其退出状态。如果线程已经终止，``pthread_join`` 立即返回。
+
+.. code-block:: none
+
+   ; 线程生命周期示意图
+   ;
+   ;   主线程                          子线程
+   ;     │                               │
+   ;     ├── pthread_create() ──────────► │
+   ;     │                               │
+   ;     │ (继续执行)                    ├── 执行线程函数
+   ;     │                               │ ...
+   ;     │                               │
+   ;     ├── pthread_join() ──────────────┤ 线程退出
+   ;     │ (等待子线程结束)               │
+   ;     │      │                         │
+   ;     │ ◄───结束───────────────────────┘
+   ;     │                               │
 
 使用 futex 等待线程结束
 ============================
