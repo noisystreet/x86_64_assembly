@@ -38,14 +38,25 @@ check_rst_inline_markup() {
     local has_error=0
 
     for f in "${files[@]}"; do
-        # 检查 :role:`xxx` 内联标记后紧跟中文括号/逗号（缺少空格）
-        # 这会导致 Sphinx 解析异常，产生 "end-string" 警告
+        # 检查 :role:`xxx` 角色标记后紧跟中文括号（缺少空格）
         if grep -Pn ':\w+:`[^`]*`[（）]' "$f" &>/dev/null; then
             if [ $has_error -eq 0 ]; then
-                echo -e "${YELLOW}⚠  :strong: 等角色标记后紧跟中文括号（缺少空格）:${NC}"
+                echo -e "${YELLOW}⚠  角色标记后紧跟中文括号（缺少空格）:${NC}"
             fi
             echo -e "  ${YELLOW}$f${NC}"
             grep -Pn ':\w+:`[^`]*`[（）]' "$f" | while read -r line; do
+                echo "    $line"
+            done
+            has_error=1
+        fi
+
+        # 检查 **bold** 后紧跟中文括号/逗号（缺少空格）
+        if grep -Pn '\*\*[^*]*\*\*[（，]' "$f" &>/dev/null; then
+            if [ $has_error -eq 0 ]; then
+                echo -e "${YELLOW}⚠  **bold** 后紧跟中文标点（缺少空格）:${NC}"
+            fi
+            echo -e "  ${YELLOW}$f${NC}"
+            grep -Pn '\*\*[^*]*\*\*[（，]' "$f" | while read -r line; do
                 echo "    $line"
             done
             has_error=1

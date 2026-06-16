@@ -34,7 +34,7 @@ lock 前缀
 
 .. warning::
 
-   ``lock`` 前缀只能用于**读取-修改-写入**（Read-Modify-Write）指令，
+   ``lock`` 前缀只能用于**读取-修改-写入** （Read-Modify-Write）指令，
    且目标必须是内存地址。它对 ``mov [mem], reg`` 这样的简单存储无效。
 
 原子交换（xchg）

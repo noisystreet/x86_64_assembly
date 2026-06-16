@@ -68,7 +68,7 @@ clone 系统调用
           CLONE_SIGHAND  | \   ; 共享信号处理
           CLONE_THREAD           ; 同一线程组
 
-   注意 ``CLONE_THREAD`` 的缺失后果：没有它，``clone`` 创建的是一个**进程**（子进程），
+   注意 ``CLONE_THREAD`` 的缺失后果：没有它，``clone`` 创建的是一个**进程** （子进程），
    而非线程（子进程拥有独立的 PID）。
 
    Linux 5.3 引入了更新、更灵活的 ``clone3`` 系统调用（RAX=435），
