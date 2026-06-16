@@ -68,6 +68,36 @@ div.admonition-exercise .admonition-title {
     color: white;
 }
 
+/* History / background story note */
+div.admonition-story {
+    border-left: 4px solid #e67e22;
+}
+
+div.admonition-story .admonition-title {
+    background: #e67e22;
+    color: white;
+}
+
+/* Application / real-world usage note */
+div.admonition-application {
+    border-left: 4px solid #3498db;
+}
+
+div.admonition-application .admonition-title {
+    background: #3498db;
+    color: white;
+}
+
+/* Fun fact note */
+div.admonition-funfact {
+    border-left: 4px solid #1abc9c;
+}
+
+div.admonition-funfact .admonition-title {
+    background: #1abc9c;
+    color: white;
+}
+
 /* Tip box for side notes */
 div.admonition-tip {
     border-left: 4px solid #8e44ad;

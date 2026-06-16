@@ -10,6 +10,16 @@ System V AMD64 调用约定
 寄存器使用规则
 ==================
 
+.. admonition:: 为什么 Linux 选择了 System V ABI？
+   :class: story
+
+   System V ABI 的起源可以追溯到 20 世纪 80 年代的 **AT&T Unix** 系统。当时 Unix 厂商（Sun、IBM、HP）各自有
+   不同的 ABI，带来了严重的互操作性问题。System V Release 4（SVR4）首次统一了 Unix 平台的 ABI 规范。
+   当 AMD 设计 x86_64 时，Linux 社区和 AMD 共同选择了 System V ABI 作为标准（而非 Intel 建议的 Itanium ABI），
+   因为它寄存器使用效率更高：6 个参数寄存器（而非 Windows x64 的 4 个）减少了栈参数传递。
+   这也解释了为什么 **Linux 和 macOS 都使用 System V ABI，而 Windows 使用不同的 x64 calling convention**——
+   纯粹是历史分叉的结果。
+
 .. list-table::
    :header-rows: 1
 

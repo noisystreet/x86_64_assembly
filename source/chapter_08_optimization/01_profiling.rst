@@ -6,6 +6,17 @@
 
 编写汇编代码时，"优化前先测量"是铁律。本节介绍如何使用 Linux 性能分析工具找到代码热点。
 
+.. admonition:: RDTSC：从可靠计时器到不可靠的"受害者"
+   :class: story
+
+   ``rdtsc``（Read Time-Stamp Counter）指令在 Pentium 时代被引入，用于读取 CPU 内部递增的周期计数器。
+   当时 CPU 频率固定，TSC 就是可靠的纳秒级计时器。但到了 **Pentium 4 (NetBurst)** 时代，Intel 引入了
+   动态频率缩放（SpeedStep），TSC 不再与真实时间线性相关。现代 x86_64 CPU 努力维持一个"恒定速率 TSC"
+   （invariant TSC），但**在多核系统上不同核心的 TSC 值可能不同步**（差异可达几十微秒）。此外，
+   推测执行和乱序执行意味着 ``rdtsc`` 附近的指令可能在其之前或之后执行，导致测量结果偏大或偏小。
+   ``lfence; rdtsc`` 序列可以缓解，但无法完全消除。Linux 内核推荐的替代方案是 ``clock_gettime``
+   系统调用——虽然开销比 ``rdtsc`` 大，但结果更可靠。
+
 perf 工具使用
 =================
 

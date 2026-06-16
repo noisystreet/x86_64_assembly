@@ -77,6 +77,17 @@ clone 系统调用
 线程创建示例
 ================
 
+.. admonition:: fork vs clone：Linus 的设计哲学
+   :class: story
+
+   在 Linux 中，``fork`` 和 ``clone`` 的关系体现了 Linus Torvalds 的经典设计哲学："提供机制，而非策略"。
+   传统 Unix 只有 ``fork``（创建子进程的副本），但 Linux 的 ``fork`` 底层实际上也是调用 ``clone``
+   （系统调用号 57 的 ``sys_fork`` 只是 ``clone`` 的一个特殊封装）。``clone`` 的优势在于精确控制
+   共享资源：用一个位掩码指定"共享什么"而非"复制什么"。这意味着 **"线程"和"进程"在 Linux 内核中
+   没有本质区别**——线程只是一个共享了地址空间的进程。这种统一模型让 Linux 的线程创建比传统 Unix 轻量得多，
+   也催生了 glibc 的 ``pthread`` 实现直接调用 ``clone`` 而非自定义内核线程接口。
+   相比之下，Windows 内核为线程和进程使用完全不同的对象类型，设计思路截然不同。
+
 .. code-block:: none
 
    ; thread_create.asm——创建线程
