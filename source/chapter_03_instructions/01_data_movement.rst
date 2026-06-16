@@ -180,7 +180,7 @@
 .. caution::
 
    一个新手常见错误是混淆了 ``mov rax, [var]`` 和 ``mov rax, var``。
-   前者加载 :strong:`地址 var 处的值`，后者加载 :strong:`var 的地址本身`（相当于 ``lea rax, [var]``）。
+   前者加载 :strong:`地址 var 处的值`，后者加载 :strong:`var 的地址本身` （相当于 ``lea rax, [var]``）。
    在高版本 NASM 中，``mov rax, var`` 会被解释为立即数加载，行为可能出乎预期。
 
 ``push`` / ``pop`` 栈操作

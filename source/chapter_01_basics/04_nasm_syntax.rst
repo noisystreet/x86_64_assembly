@@ -152,7 +152,7 @@ NASM 中主要的数据段和代码段：
 GAS（GNU Assembler）语法对照
 ================================
 
-NASM 并非唯一的汇编器选择。大多数 Linux 系统预装的是 :strong:`GAS`（GNU Assembler，命令 ``as``），
+NASM 并非唯一的汇编器选择。大多数 Linux 系统预装的是 :strong:`GAS` （GNU Assembler，命令 ``as``），
 它是 GCC 工具链的一部分。GAS 默认使用 AT&T 语法，也可以通过 ``.intel_syntax noprefix`` 伪指令切换为 Intel 语法。
 
 .. list-table:: GAS 语法模式对比
