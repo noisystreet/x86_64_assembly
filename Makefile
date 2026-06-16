@@ -25,6 +25,11 @@ help:
 precommit:
 	@bash scripts/precommit-check.sh
 
+# html 构建前自动运行 precommit 检查
+# 显式规则覆盖 %: Makefile 泛匹配
+html: Makefile precommit
+	@$(SPHINXBUILD) -M html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+
 # 本地预览服务器（默认 8000 端口）
 serve: html
 	@echo "Open http://localhost:8000/ in your browser"
