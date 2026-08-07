@@ -41,7 +41,7 @@
 
 1. **许可证**：本文档采用 CC BY-SA 4.0（Creative Commons Attribution-ShareAlike 4.0 International），详见 `LICENSE` 文件
 2. **文档格式**：使用 reStructuredText（`.rst`）格式
-3. **引用源码**：使用绝对路径的 `file:///` 链接引用源码文件，格式为 `` `链接文本 <file:///绝对路径/文件>`__ ``
+3. **引用源码**：使用**相对路径**引用源码文件（绝对路径 `file:///` 在跨机器 / 部署后失效，禁止使用）。嵌入代码用 `` .. literalinclude:: <相对路径>`` ``，说明来源用 `` :caption: <相对路径>`` ``（如 `` :caption: examples/hello.asm`` ``）；路径相对当前 `.rst` 所在目录。
 4. **避免冗余**：不创建不必要的文件，优先编辑已有文件
 5. **权限**：不做 `git push --force`、`reset --hard` 等破坏性操作
 6. **代码示例**：在文档中引用代码时，说明其所属文件和行号范围
