@@ -17,6 +17,7 @@ pip install -r requirements.txt
 make html       # 构建 HTML
 make serve      # 构建并在 localhost:8000 启动预览
 make check      # 编译验证所有示例
+make clean      # 清理构建产物
 ```
 
 ## 目录结构
