@@ -131,9 +131,11 @@ if [ "$1" = "--hook" ]; then
     check_rst_files $STAGED_FILES
     EXIT_CODE=$?
 
-    # 额外检查内联标记格式
+    # 额外检查内联标记格式；发现问题时将退出码提升为警告(2)
     if [ -n "$STAGED_FILES" ]; then
-        check_rst_inline_markup $STAGED_FILES && true
+        if ! check_rst_inline_markup $STAGED_FILES; then
+            [ $EXIT_CODE -eq 0 ] && EXIT_CODE=2
+        fi
     fi
 
 elif [ "$1" = "--staged" ]; then
@@ -149,10 +151,13 @@ else
     # 默认: 检查所有 RST 文件
     echo -e "${YELLOW}=== 检查所有 RST 文档 ===${NC}"
     RST_FILES=$(find "$PROJECT_ROOT/source" -name '*.rst' | sort)
-    check_rst_files $RST_FILES
+    # 用 || true 抑制 set -e 中断，确保内联标记检查也能执行
+    check_rst_files $RST_FILES || true
 
-    # 额外检查内联标记格式
-    check_rst_inline_markup $RST_FILES
+    # 额外检查内联标记格式；发现问题时将退出码提升为警告(2)
+    if ! check_rst_inline_markup $RST_FILES; then
+        [ $EXIT_CODE -eq 0 ] && EXIT_CODE=2
+    fi
 fi
 
 case $EXIT_CODE in
