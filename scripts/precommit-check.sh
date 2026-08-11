@@ -20,6 +20,13 @@ fi
 BUILD_DIR="_build/precommit-check"
 EXIT_CODE=0
 
+# 优先使用项目虚拟环境中的 Python（其中安装了 Sphinx），否则回退到系统 python3
+if [ -x "$PROJECT_ROOT/.venv/bin/python" ]; then
+    PYTHON="$PROJECT_ROOT/.venv/bin/python"
+else
+    PYTHON="python3"
+fi
+
 # 颜色输出
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -27,7 +34,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 check_sphinx() {
-    if ! python3 -c "import sphinx" 2>/dev/null; then
+    if ! "$PYTHON" -c "import sphinx" 2>/dev/null; then
         echo -e "${RED}错误: 未安装 Sphinx。请先运行: pip install sphinx sphinx-rtd-theme${NC}"
         exit 1
     fi
@@ -84,7 +91,7 @@ check_rst_files() {
 
     echo -e "${YELLOW}运行 Sphinx 语法检查...${NC}"
     # 使用 dummy builder 只做解析不做输出，速度快
-    if python3 -m sphinx -b dummy "$PROJECT_ROOT/source" "$PROJECT_ROOT/$BUILD_DIR" 2>/tmp/sphinx_precommit_err.txt 1>/dev/null; then
+    if "$PYTHON" -m sphinx -b dummy "$PROJECT_ROOT/source" "$PROJECT_ROOT/$BUILD_DIR" 2>/tmp/sphinx_precommit_err.txt 1>/dev/null; then
         # 检查是否有警告
         if grep -qE '(WARNING|ERROR)' /tmp/sphinx_precommit_err.txt 2>/dev/null; then
             echo -e "${YELLOW}⚠  构建成功，但有警告:${NC}"
