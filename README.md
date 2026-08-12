@@ -13,12 +13,18 @@ x86_64 汇编语言入门与进阶教程，涵盖基础语法、指令集、调�
 ## 本地构建
 
 ```bash
+# 创建并激活虚拟环境（推荐，避免系统 Python 的 PEP 668 限制）
+python3 -m venv .venv
+source .venv/bin/activate
+
 pip install -r requirements.txt
 make html       # 构建 HTML
 make serve      # 构建并在 localhost:8000 启动预览
 make check      # 编译验证所有示例
 make clean      # 清理构建产物
 ```
+
+> 提示：`make` 会自动优先使用 `.venv/bin/python` 中的 Sphinx；若未创建虚拟环境则回退到系统 `python3`。
 
 ## 目录结构
 

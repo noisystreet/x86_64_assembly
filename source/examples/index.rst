@@ -14,4 +14,5 @@
    arrays
    strings
    sse_example
+   avx_example
    mmap_example

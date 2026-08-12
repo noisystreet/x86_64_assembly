@@ -17,3 +17,19 @@ __pycache__/
 # 临时文件
 *.tmp
 *.bak
+
+# Python 虚拟环境
+.venv/
+venv/
+
+# 示例编译产物（NASM 目标文件与链接后的可执行文件）
+source/examples/*.o
+source/examples/*.out
+source/examples/hello
+source/examples/registers
+source/examples/arrays
+source/examples/strings
+source/examples/control_flow
+source/examples/functions
+source/examples/mmap_example
+source/examples/sse_example
