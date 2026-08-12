@@ -10,3 +10,4 @@
    01_thread_basics
    02_synchronization
    03_atomic_operations
+   04_memory_ordering
