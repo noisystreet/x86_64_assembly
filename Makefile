@@ -4,7 +4,8 @@
 # You can set these variables from the command line, and also
 # from the environment for the first two.
 SPHINXOPTS    ?=
-SPHINXBUILD   ?= python3 -m sphinx
+# 优先使用项目虚拟环境中的 Python（其中安装了 Sphinx），否则回退到系统 python3
+SPHINXBUILD   ?= $(if $(wildcard .venv/bin/python),.venv/bin/python -m sphinx,python3 -m sphinx)
 SOURCEDIR     = source
 BUILDDIR      = _build
 
