@@ -162,7 +162,7 @@ System V ABI 要求 ``rsp`` 在 ``call`` 指令执行前必须是 **16 字节对
 红色区域（Red Zone）
 =====================
 
-System V AMD64 ABI 定义了一个特殊的栈区域：**红色区域（Red Zone）**，即 ``rsp`` 下方 128 字节的区域。
+System V AMD64 ABI 定义了一个特殊的栈区域：**红色区域（Red Zone）** ，即 ``rsp`` 下方 128 字节的区域。
 
 .. code-block:: none
 
