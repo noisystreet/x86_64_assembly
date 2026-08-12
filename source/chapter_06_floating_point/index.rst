@@ -11,3 +11,4 @@
    01_sse_sse2
    02_avx
    03_floating_point_ops
+   04_fma

@@ -2,6 +2,7 @@
 # =======================================================
 
 from datetime import datetime
+import subprocess
 
 # -- Project information -----------------------------------------------------
 
@@ -9,10 +10,24 @@ project = 'x86_64 汇编语言教程'
 author = 'noisystreet'
 copyright = f'{datetime.now().year}, {author}'
 
+
+def _git_version() -> str:
+    """从最近的 git tag 读取版本号；失败时回退到默认值。"""
+    try:
+        tag = subprocess.check_output(
+            ['git', 'describe', '--tags', '--abbrev=0'],
+            stderr=subprocess.DEVNULL,
+            text=True,
+        ).strip()
+        return tag.lstrip('v')
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return '1.0'
+
+
 # The short X.Y version
-version = '1.0'
+version = _git_version()
 # The full version, including alpha/beta/rc tags
-release = '1.0'
+release = version
 
 # -- General configuration ---------------------------------------------------
 
