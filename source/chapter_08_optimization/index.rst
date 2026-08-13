@@ -9,3 +9,4 @@
 
    01_profiling
    02_optimization_techniques
+   03_simd_vectorization
